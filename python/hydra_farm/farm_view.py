@@ -11,7 +11,6 @@ from collections import defaultdict
 from PyQt5 import QtGui, QtCore, QtWidgets, uic
 
 from hydra_farm.qt_dialogs import message_boxes
-from hydra_farm.qt_dialogs import widget_factories
 from hydra_farm.qt_dialogs.data_table import DataTableDialog
 from hydra_farm.qt_dialogs.detailed_dialog import DetailedDialog
 from hydra_farm.qt_dialogs.node_editor_dialog import NodeEditorDialog
@@ -48,9 +47,6 @@ class FarmView(QtWidgets.QMainWindow):
     online_this_node_button: QtWidgets.QPushButton
     offline_this_node_button: QtWidgets.QPushButton
     get_off_this_node_button: QtWidgets.QPushButton
-
-    # Recent Jobs Tab
-    limit_spinbox: QtWidgets.QSpinBox
 
     # This Node Tab
     node_name_label: QtWidgets.QLabel
@@ -389,11 +385,8 @@ class FarmView(QtWidgets.QMainWindow):
             if self.current_selected_job:
                 self.load_task_tree(self.current_selected_job)
             self.populate_node_tree()
-        # Recent Jobs:
+        # This Node
         elif cur_tab == 1:
-            self.load_task_grid()
-        # This Node:
-        elif cur_tab == 2:
             if self.this_node:
                 self.update_this_node_info(this_node)
         t.log()
@@ -421,20 +414,6 @@ class FarmView(QtWidgets.QMainWindow):
         self.min_priority_label.setText(str(this_node.min_priority))
         self.capabilities_label.setText(str(this_node.capabilities))
         self.pulse_label.setText(str(this_node.pulse))
-
-    def load_task_grid(self):
-        """Fetches jobs and updates the recent_jobs_grid in the Recent Jobs tab.
-
-        """
-        command = "WHERE archived = '0' ORDER BY id DESC LIMIT %s"
-        records = sql.HydraRenderJob.fetch(command, (self.limit_spinbox.value(),), )
-        if not records:
-            return
-
-        columns = [widget_factories.label_factory(col) for col in sql.HydraRenderJob.columns]
-
-        widget_factories.clear_layout(self.recent_jobs_grid)
-        widget_factories.setup_data_grid(records, columns, self.recent_jobs_grid)
 
     def update_status_bar(self, this_node: sql.HydraRenderNode = None):
         """Fetches the latest status data and updates the status bar.
