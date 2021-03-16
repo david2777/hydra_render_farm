@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FarmView</class>
+ <widget class="QMainWindow" name="FarmView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1294</width>
+    <height>739</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FarmView</string>
+  </property>
+  <widget class="QWidget" name="central_widget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="central_button_layout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="refresh_button">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Refresh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="auto_update_cbx">
+        <property name="text">
+         <string>Auto Refresh</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="central_button_spacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="online_this_node_button">
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow this node to accept render tasks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Online</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="offline_this_node_button">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Don't allow this node to accept any new jobs (it will still finish what it's working on)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Offline</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="get_off_this_node_button">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tell this node to stop the current job, put it back on the job board, and don't accept any more.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Get Off!</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tab_widget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="job_list_tab">
+       <attribute name="title">
+        <string>Job List</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QSplitter" name="splitter_nodelist">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <widget class="QSplitter" name="splitter_job_list">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <widget class="QWidget" name="layoutWidget_2">
+            <layout class="QGridLayout" name="job_grid_layout">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="job_filter_input">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="placeholderText">
+                <string>Filter Jobs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QCheckBox" name="user_filter_cbx">
+               <property name="text">
+                <string>Only Show My Jobs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QCheckBox" name="archived_cbx">
+               <property name="text">
+                <string>Show Archived Jobs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="job_label">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Jobs:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="4">
+              <widget class="QTreeWidget" name="job_tree">
+               <property name="alternatingRowColors">
+                <bool>false</bool>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::ExtendedSelection</enum>
+               </property>
+               <property name="indentation">
+                <number>15</number>
+               </property>
+               <property name="animated">
+                <bool>true</bool>
+               </property>
+               <attribute name="headerDefaultSectionSize">
+                <number>50</number>
+               </attribute>
+               <attribute name="headerMinimumSectionSize">
+                <number>50</number>
+               </attribute>
+               <attribute name="headerShowSortIndicator" stdset="0">
+                <bool>false</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget_3">
+            <layout class="QGridLayout" name="task_grid_layout">
+             <item row="2" column="0" colspan="3">
+              <widget class="QTreeWidget" name="task_tree">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::CustomContextMenu</enum>
+               </property>
+               <property name="editTriggers">
+                <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>false</bool>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::ExtendedSelection</enum>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+               </property>
+               <property name="indentation">
+                <number>15</number>
+               </property>
+               <property name="rootIsDecorated">
+                <bool>true</bool>
+               </property>
+               <property name="animated">
+                <bool>true</bool>
+               </property>
+               <property name="columnCount">
+                <number>1</number>
+               </property>
+               <column>
+                <property name="text">
+                 <string notr="true">1</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="task_tree_job_label">
+               <property name="text">
+                <string>Job ID: -[1]</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="task_tree_label">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Tasks:</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QTreeWidget" name="node_tree">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="verticalScrollMode">
+            <enum>QAbstractItemView::ScrollPerItem</enum>
+           </property>
+           <property name="indentation">
+            <number>0</number>
+           </property>
+           <property name="rootIsDecorated">
+            <bool>false</bool>
+           </property>
+           <property name="itemsExpandable">
+            <bool>false</bool>
+           </property>
+           <property name="expandsOnDoubleClick">
+            <bool>false</bool>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+          <widget class="QLineEdit" name="node_filter_input">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string>Filter Nodes</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="recent_jobs_tab">
+       <attribute name="title">
+        <string>Recent Jobs</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="3" column="0">
+         <widget class="QScrollArea" name="recent_jobs_scrollarea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="recent_jobs_main_layout">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>1250</width>
+             <height>596</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="3" column="0">
+             <spacer name="recent_jobs_spacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <layout class="QGridLayout" name="recent_jobs_grid"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Number of Jobs:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="limit_spinbox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="this_node_tab">
+       <attribute name="title">
+        <string>This Node</string>
+       </attribute>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>651</width>
+          <height>223</height>
+         </rect>
+        </property>
+        <layout class="QFormLayout" name="this_node_layout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="node_name_label_title">
+           <property name="text">
+            <string>Node name:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="node_name_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="node_status_label_title">
+           <property name="text">
+            <string>Node status:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="node_status_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="task_id_label_title">
+           <property name="text">
+            <string>Task ID:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="task_id_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="node_version_label_title">
+           <property name="text">
+            <string>Version:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="node_version_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="min_priority_label_title">
+           <property name="text">
+            <string>Min Priority:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="min_priority_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="capabilities_label_title">
+           <property name="text">
+            <string>Capabilities:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="capabilities_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="pulse_label_title">
+           <property name="text">
+            <string>Pulse:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="pulse_label">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QPushButton" name="edit_this_node_button">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Edit This Node...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

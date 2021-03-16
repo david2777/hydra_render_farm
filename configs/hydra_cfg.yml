@@ -1,0 +1,16 @@
+general:
+  keep_all_render_logs: true
+
+networking:
+  dns_domain_ext:
+  host_port: 3310
+
+database:
+  host: localhost
+  port: 3306
+  db: hydra
+  autologin: True
+  username:
+
+logs:
+  render_log_path: C:\Hydra\logs\render
