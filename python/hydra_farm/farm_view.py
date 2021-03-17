@@ -11,10 +11,9 @@ from collections import defaultdict
 from PyQt5 import QtGui, QtCore, QtWidgets, uic
 
 from hydra_farm.qt_dialogs import message_boxes
-from hydra_farm.qt_dialogs.data_table import DataTableDialog
-from hydra_farm.qt_dialogs.detailed_dialog import DetailedDialog
 from hydra_farm.qt_dialogs.node_editor_dialog import NodeEditorDialog
-from hydra_farm.qt_widgets.farm_view_widgets import FarmViewMenu, JobTreeItem, TaskTreeItem, NodeTreeItem
+from hydra_farm.qt_dialogs.record_view_dialog import RecordViewDialog
+from hydra_farm.qt_widgets.farm_view_widgets import *
 
 from hydra_farm.utils import yaml_cache
 from hydra_farm.utils import resource_resolver
@@ -102,25 +101,14 @@ class FarmView(QtWidgets.QMainWindow):
         self.update_timer.start(UPDATE_TIMER_INTERVAL)
         self.do_refresh()
 
-    @staticmethod
-    def show_data_list_dialog(records: Collection[sql.AbstractHydraTable]):
+    def show_data_list_dialog(self, records: List[sql.AbstractHydraTable]):
         """Create and show a dialog with all columns for the given list of records.
 
         Args:
             records (Collection[sql.AbstractHydraTable]): Collection of HydraRender* instances.
 
         """
-        DetailedDialog.create(records)
-
-    @staticmethod
-    def show_data_table_dialog(record: sql.AbstractHydraTable):
-        """Create and show a dialog with all columns for the given single record.
-
-        Args:
-            record (sql.AbstractHydraTable): Record to display.
-
-        """
-        DataTableDialog.create(record)
+        RecordViewDialog(self, records)
 
     # --------------------------------------------------------------------------#
     # ---------------------------UI SETUP METHODS-------------------------------#
@@ -168,7 +156,7 @@ class FarmView(QtWidgets.QMainWindow):
         self.edit_this_node_button.clicked.connect(self.node_editor_callback)
 
         # job_tree itemClicked
-        self.job_tree.itemSelectionChanged.connect(self.job_tree_clicked_callback)
+        self.job_tree.itemClicked.connect(self.job_tree_clicked_callback)
 
         # Connect basic filter checkboxKeys
         self.archived_cbx.stateChanged.connect(self.archived_filter_callback)
@@ -599,12 +587,7 @@ class FarmView(QtWidgets.QMainWindow):
         """
         selected_jobs = self.get_job_tree_sel()
         if selected_jobs:
-            if len(selected_jobs) == 1:
-                self.show_data_table_dialog(selected_jobs[0])
-            else:
-                self.show_data_list_dialog(selected_jobs)
-
-            self.do_refresh()
+            self.show_data_list_dialog(selected_jobs)
 
     def kill_job_callback(self):
         """Kill the selected jobs, after confirming with the user.
@@ -716,15 +699,14 @@ class FarmView(QtWidgets.QMainWindow):
     # -----------------------------TASK METHODS---------------------------------#
     # --------------------------------------------------------------------------#
 
-    def job_tree_clicked_callback(self):
+    def job_tree_clicked_callback(self, item: JobTreeItem):
         """Handles clicks on the job tree triggering updates on the task tree.
 
         """
         # noinspection PyTypeChecker
-        sel: JobTreeItem = self.job_tree.currentItem()
-        self.load_task_tree(sel.job, clear=True)
-        self.current_selected_job = sel.job
-        self.task_tree_job_label.setText("Job ID: [{0}]".format(sel.job.id))
+        self.load_task_tree(item.job, clear=True)
+        self.current_selected_job = item.job
+        self.task_tree_job_label.setText("Job ID: [{0}]".format(item.job.id))
 
     def load_task_tree(self, job: sql.HydraRenderJob, clear: bool = False):
         """Load the tasks into the task tree for the selected job.
@@ -882,12 +864,7 @@ class FarmView(QtWidgets.QMainWindow):
 
         """
         tasks = self.get_task_tree_sel()
-        if not tasks:
-            return
-
-        if len(tasks) == 1:
-            self.show_data_table_dialog(tasks[0])
-        else:
+        if tasks:
             self.show_data_list_dialog(tasks)
 
     def _open_log(self, task: sql.HydraRenderTask):
@@ -1084,10 +1061,7 @@ class FarmView(QtWidgets.QMainWindow):
         """
         node_list = self.get_node_tree_sel()
         if node_list:
-            if len(node_list) == 1:
-                self.show_data_table_dialog(node_list[0])
-            else:
-                self.show_data_list_dialog(node_list)
+            self.show_data_list_dialog(node_list)
 
     def select_by_host_callback(self):
         """Opens a dialog for the user to select nodes by host name.

@@ -13,6 +13,8 @@ THIS_USER = config['database']['username']  # TODO: What happens if the user log
 THIS_USER = THIS_USER if THIS_USER else 'HydraUser'
 THIS_HOST = socket.gethostname()
 
+__all__ = ['FarmViewMenu', 'JobTreeItem', 'TaskTreeItem', 'NodeTreeItem']
+
 
 class FarmViewMenu(QtWidgets.QMenu):
     """Simple QMenu that fetches data from the main Farm View window"""
