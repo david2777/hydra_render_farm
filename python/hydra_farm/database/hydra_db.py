@@ -218,18 +218,31 @@ class AbstractHydraTable(object):
         self.set_no_dirty(attr, value)
         return value
 
-    def refresh(self, explicit_transaction: Transaction = None):
+    def get_set_columns(self) -> list:
+        """Return a list of columns which has been set on this instance, ie the columns which were fetched.
+
+        Returns:
+            list: List of columns which has been set on this instance.
+
+        """
+        return [c for c in self.columns if hydra_utils.hasattr_static(self, c)]
+
+    def refresh(self, explicit_transaction: Transaction = None, all_columns: bool = False):
         """Refresh this instance with the latest data from the DB.
 
         Args:
             explicit_transaction (Transaction): Either an explicit db transaction or None.
+            all_columns (bool): If True will fetch all columns, default False will fetch  columns set on this instance.
 
         """
-        columns = tuple()
-        columns = set(map(str, columns))
-        columns.add(self.primary_key)
-        col_sel = ','.join(columns)
-        select = "SELECT {0} FROM {1} WHERE {2} = %s".format(col_sel, self.table_name, self.primary_key)
+        if all_columns:
+            columns = '*'
+        else:
+            columns = set(self.get_set_columns())
+            columns.add(self.primary_key)
+            columns = ','.join(columns)
+
+        select = "SELECT {0} FROM {1} WHERE {2} = %s".format(columns, self.table_name, self.primary_key)
 
         t, transaction_context = self._get_transaction(explicit_transaction)
         with transaction_context:
