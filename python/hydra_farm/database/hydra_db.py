@@ -227,6 +227,20 @@ class AbstractHydraTable(object):
         """
         return [c for c in self.columns if hydra_utils.hasattr_static(self, c)]
 
+    def get_attr_static(self, attr: str) -> Any:
+        """getattr without dynamic lookup via __getattr__ or __getattribute__
+
+        Args:
+            attr (str): Attr to get from this instance if it is set.
+
+        Returns:
+            Any: The value if the attr is set, None if not.
+
+        """
+        if not hydra_utils.hasattr_static(self, attr):
+            return None
+        return getattr(self, attr)
+
     def refresh(self, explicit_transaction: Transaction = None, all_columns: bool = False):
         """Refresh this instance with the latest data from the DB.
 
