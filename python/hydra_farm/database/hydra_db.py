@@ -530,6 +530,22 @@ class AbstractHydraTable(object):
 
         return True
 
+    def as_dict(self, all_columns: bool = False) -> dict:
+        """Dump this record as a dict.
+
+        Args:
+            all_columns (bool): If True will pull all columns before dumping. Default False will only dump columns
+            set on this instance.
+
+        Returns:
+            dict: This instance in the form of a dict.
+
+        """
+        # If all_columns is True and not all columns are set, fetch everything
+        if all_columns and not len(self.get_set_columns()) == len(self.columns):
+            self.refresh(all_columns=True)
+        return {c: getattr(self, c) for c in self.get_set_columns()}
+
 
 class HydraRenderNode(AbstractHydraTable):
     table_name = "hydra.render_nodes"
