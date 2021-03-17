@@ -2,6 +2,7 @@
 import re
 import time
 import socket
+import inspect
 import logging
 
 from hydra_farm.utils import yaml_cache
@@ -61,6 +62,24 @@ class Timer(object):
 
         """
         return '%.{}f'.format(precision) % (time.perf_counter() - self.start)
+
+
+def hasattr_static(obj: object, name: str) -> bool:
+    """hasattr without dynamic lookup via __getattr__ or __getattribute__.
+
+    Args:
+        obj (object): Object to check
+        name (str): Attr to check for
+
+    Returns:
+        bool: True if the object has the attr, False if not.
+
+    """
+    try:
+        inspect.getattr_static(obj, name)
+        return True
+    except AttributeError:
+        return False
 
 
 def my_host_name() -> str:
