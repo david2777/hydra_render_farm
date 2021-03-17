@@ -344,7 +344,7 @@ class AbstractHydraTable(object):
 
         result = [cls(r) for r in result]
         for r in result:
-            r._from_dict = True
+            r._from_db = True
 
         return result
 
