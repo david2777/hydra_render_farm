@@ -1,6 +1,6 @@
+"""Define Database Tables and Transaction Class"""
 from __future__ import annotations
 import os
-import sys
 import ast
 import shlex
 import pathlib
@@ -11,11 +11,11 @@ from typing import Sequence, List, Type, TypeVar, Any, Tuple, Union, Iterable, M
 from contextlib import nullcontext
 
 import MySQLdb
-from PyQt5 import QtGui
 
 from hydra_farm.utils import yaml_cache
 from hydra_farm.utils import hydra_utils
-from hydra_farm.utils import password_storage
+from hydra_farm.database import db_login
+from hydra_farm.database.enums import HydraStatus
 from hydra_farm.utils.logging_setup import logger
 from hydra_farm.networking.connections import HydraRequest, HydraResponse, send_request
 
@@ -25,120 +25,14 @@ UNIT_TEST = bool(ast.literal_eval(os.environ.get('Hydra_Unit_Test', "False")))
 
 T = TypeVar('T', bound='AbstractHydraTable')  # For type hinting on tables
 
-
-class HydraStatus(Enum):
-    """Simple Enum to store statuses used for Jobs, Tasks, and Nodes.
-
-    """
-    # Both Status
-    STARTED = 'S'  # Job in progress
-
-    # Job/Task Status
-    READY = 'R'  # Ready to be run by a render node
-    PAUSED = 'U'  # Job was paused
-    FINISHED = 'F'  # Job complete
-    KILLED = 'K'  # Job was killed
-    ERROR = 'E'  # Job returned a non-zero exit code
-    CRASHED = 'C'  # Machine or server software crashed, task was found in host's DB record upon restart
-    TIMEOUT = 'T'  # Job took longer than the timeout time allowed
-
-    # Node Status
-    IDLE = 'I'  # Ready to accept jobs
-    OFFLINE = 'O'  # Not ready to accept jobs
-    PENDING = 'P'  # Offline after current job is complete
-    GETOFF = 'G'  # Getting off node
-
-    def __eq__(self, other):
-        if isinstance(other, str):
-            return bool(self.value == other)  # Overriding so that 'S' == HydraStatus.STARTED is True.
-        else:
-            return super().__eq__(other)
-
-    def __hash__(self):
-        return hash(self.value)  # Using value here so that 'S' in {HydraStatus.STARTED} is True.
-
-    @property
-    def nice_name(self) -> str:
-        """Return the enum name capitalized. Eg READY => Ready.
-
-        Returns:
-            str: The enum name capitalized.
-
-        """
-        return self.name.capitalize()
-
-
 STUCK_STATUS = {HydraStatus.STARTED, HydraStatus.PENDING}
-
-
-class Color(Enum):
-    U = (240, 230, 200)  # Light Orange
-    R = (255, 255, 255)  # White
-    F = (200, 240, 200)  # Light Green
-    K = (240, 200, 200)  # Light Red
-    C = (220,  90,  90)  # Dark Red
-    S = (200, 220, 240)  # Light Blue
-    E = (220,  90,  90)  # Red
-    I = (255, 255, 255)  # White
-    O = (240, 240, 240)  # Gray
-    P = (240, 230, 200)  # Orange
-    T = (220,  90,  90)  # Dark Red
-    G = (220,  90,  90)  # Dark Red
-
-    @property
-    def q_color(self) -> QtGui.QColor:
-        """Returns the color value as a Qt QColor.
-
-        Returns:
-            QtGui.QColor: A QColor of the color value.
-
-        """
-        return QtGui.QColor(*self.value)
-
-
-def get_database_info() -> tuple:
-    """Finds and returns database connection info.
-
-    Returns:
-        tuple: (host, username, password, db_name, port) all used to connect to the DB.
-
-    """
-    logger.debug("Getting database info...")
-
-    # Database info
-    host = config['database']['host']
-    domain = config['networking']['dns_domain_ext']
-    if domain and host not in ["localhost", "::1"] and not host.startswith("127."):
-        host = "{0}.{1}".format(host, domain)
-    database_name = config['database']['db']
-    port = int(config['database']['port'])
-    db_username = config['database']['username']
-
-    # Login info
-    autologin = config['database']['autologin']
-    db_password = None
-    if autologin:
-        db_password = password_storage.load_credentials(db_username)
-        if not db_password:
-            autologin = False
-
-    # Prompt for login
-    if not autologin:
-        return_values = password_storage.qt_prompt()
-        if not all(return_values):
-            logger.error("Could not login!")
-            sys.exit(1)
-        else:
-            db_username, db_password = return_values
-
-    return host, db_username, db_password, database_name, port
 
 
 class Transaction(object):
     """SQL Transaction Context Manger. Stores login info as class variables.
 
     """
-    host, db_username, db_password, database_name, port = get_database_info()
+    host, db_username, db_password, database_name, port = db_login.get_database_info()
     in_transaction = False
 
     def __init__(self):
