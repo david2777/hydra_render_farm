@@ -17,6 +17,7 @@ from hydra_farm.qt_widgets.farm_view_widgets import *
 
 from hydra_farm.utils import yaml_cache
 from hydra_farm.utils import resource_resolver
+from hydra_farm.database import enums
 from hydra_farm.database import hydra_db as sql
 import hydra_farm.utils.long_strings as longstr
 from hydra_farm.utils.logging_setup import logger
@@ -729,7 +730,7 @@ class FarmView(QtWidgets.QMainWindow):
 
         # Set node colors
         # Reset colors
-        color = sql.Color["R"].q_color
+        color = enums.Color["R"].q_color
         for i in range(self.node_tree.topLevelItemCount()):
             self.node_tree.topLevelItem(i).setBackground(0, color)
 
@@ -739,7 +740,7 @@ class FarmView(QtWidgets.QMainWindow):
             node_search = self.node_tree.findItems(node, QtCore.Qt.MatchExactly, 0)
             if node_search:
                 node_item = node_search[0]
-                node_item.setBackground(0, sql.Color["E"].q_color)
+                node_item.setBackground(0, enums.Color["E"].q_color)
 
         # Set Task Colors
         if not task_list:
@@ -753,7 +754,7 @@ class FarmView(QtWidgets.QMainWindow):
                 node_search = self.node_tree.findItems(str(node), QtCore.Qt.MatchExactly, 0)
                 if node_search:
                     node_item = node_search[0]
-                    node_item.setBackground(0, sql.Color[status].q_color)
+                    node_item.setBackground(0, enums.Color[status].q_color)
 
     def get_task_tree_sel(self) -> List[sql.HydraRenderTask]:
         """Returns list of tasks selected in the task tree.

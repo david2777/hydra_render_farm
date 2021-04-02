@@ -6,6 +6,7 @@ from typing import Callable
 from PyQt5 import QtGui, QtWidgets
 
 from hydra_farm.utils import yaml_cache
+from hydra_farm.database import enums
 from hydra_farm.database import hydra_db as sql
 
 config = yaml_cache.get_hydra_cfg()
@@ -93,7 +94,7 @@ class JobTreeItem(QtWidgets.QTreeWidgetItem):
                 self.setBackground(i, QtGui.QColor(200, 200, 200))
 
         # Set Status Color
-        self.setBackground(2, sql.Color[self.job.status].q_color)
+        self.setBackground(2, enums.Color[self.job.status].q_color)
         
         # User Name Bold
         if self.job.owner == THIS_USER:
@@ -144,7 +145,7 @@ class TaskTreeItem(QtWidgets.QTreeWidgetItem):
         for i, data in enumerate(task_data):
             self.setData(i, 0, str(data))
 
-        self.setBackground(2, sql.Color[self.task.status].q_color)
+        self.setBackground(2, enums.Color[self.task.status].q_color)
         if self.task.host == THIS_HOST and self.task.status != sql.HydraStatus.READY:
             font = QtGui.QFont()
             font.setWeight(QtGui.QFont.DemiBold)
@@ -187,7 +188,7 @@ class NodeTreeItem(QtWidgets.QTreeWidgetItem):
         for i, data in enumerate(node_data):
             self.setData(i, 0, str(data))
 
-        self.setBackground(1, sql.Color[self.node.status].q_color)
+        self.setBackground(1, enums.Color[self.node.status].q_color)
         if self.node.host == THIS_HOST:
             font = QtGui.QFont()
             font.setBold(True)
