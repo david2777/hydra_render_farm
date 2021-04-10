@@ -20,7 +20,7 @@ class InstanceLock(object):
         """
         self.locked = False
         self.name = name
-        self.temp_file_path = pathlib.Path(BASEDIR, '{}.lock'.format(self.name))
+        self.temp_file_path = pathlib.Path(BASEDIR, f'{self.name}.lock')
         logger.info("Temp File: %s", self.temp_file_path)
 
         # Windows

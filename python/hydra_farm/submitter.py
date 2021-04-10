@@ -173,8 +173,7 @@ class SubmitterMain(QtWidgets.QMainWindow):
         b = self.maya_render_by_frame_spin.value()
         all_frames = len(range(s, e)[::b])
         all_frames = 1 if not all_frames else all_frames
-        s = '{} Frames'
-        self.maya_render_batch_info_label.setText(s.format(all_frames))
+        self.maya_render_batch_info_label.setText(f'{all_frames} Frames')
 
     def update_layout(self):
         """Update the layout to reflect the users mode selection.
@@ -282,8 +281,7 @@ class SubmitterMain(QtWidgets.QMainWindow):
             by_frame = self.maya_render_by_frame_spin.value()
 
             if start_frame > end_frame:
-                err = 'Start frame of {} cannot be more than end frame of {}'
-                raise ValueError(err.format(start_frame, end_frame))
+                raise ValueError(f'Start frame of {start_frame} cannot be more than end frame of {end_frame}')
 
             frame_list = list(range(start_frame, (end_frame + 1)))[::by_frame]
             frame_list += [end_frame] if end_frame not in frame_list else []
@@ -323,7 +321,7 @@ class SubmitterMain(QtWidgets.QMainWindow):
             t.insert()
             logger.info('Submitted Task %s', t.id)
 
-        about_box(self, 'Submitted!', 'Submitted 1 jobs and {} tasks.'.format(len(tasks)))
+        about_box(self, 'Submitted!', f'Submitted 1 jobs and {len(tasks)} tasks.')
 
 
 if __name__ == '__main__':

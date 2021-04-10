@@ -45,7 +45,7 @@ def send_request(address: str, port: int, request: "HydraRequest") -> "HydraResp
     except Exception:
         logger.exception('Unhandled Exception in send_request')
         e = traceback.format_exc().splitlines()
-        response = HydraResponse.from_args('Unhandled Exception: {}'.format(e[-1]))
+        response = HydraResponse.from_args(f'Unhandled Exception: {e[-1]}')
     finally:
         sock.close()
         logger.debug("TCP Connection to %s:%d was closed.", address, port)
@@ -60,7 +60,7 @@ class _HydraDataStream(object):
     _all: tuple
 
     def __repr__(self):
-        return '{0} {1}'.format(self.__class__.__name__, self.dict)
+        return f'{self.__class__.__name__} {self.dict}'
 
     @property
     def dict(self) -> dict:

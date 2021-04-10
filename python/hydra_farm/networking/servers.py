@@ -22,7 +22,7 @@ class HydraTCPServerThread(ht.HydraThread):
 
         """
         self.server = _HydraSocketServer(("", port), _HydraTCPHandler)
-        logger.debug('Starting HydraTCPServerThread on port {}'.format(port))
+        logger.debug('Starting HydraTCPServerThread on port %s', port)
         super(HydraTCPServerThread, self).__init__('HydraTCPServer', self.server.serve_forever)
 
     def terminate(self) -> None:
@@ -64,7 +64,7 @@ class _HydraTCPHandler(socketserver.StreamRequestHandler):
             except Exception:
                 logger.exception('Unhandled Exception in _HydraTCPHandler.handle')
                 e = traceback.format_exc().splitlines()
-                response = HydraResponse.from_args('Unhandled Exception: {}'.format(e[-1]))
+                response = HydraResponse.from_args(f'Unhandled Exception: {e[-1]}')
         elif request.cmd == 'echo':
             try:
                 res = request.args[0]
@@ -72,7 +72,7 @@ class _HydraTCPHandler(socketserver.StreamRequestHandler):
                 res = 'echo'
             response = HydraResponse.from_args(res, False)
         else:
-            err = '{} has no handler!'.format(self.server.__class__.__name__)
+            err = f'{self.server.__class__.__name__} has no handler!'
             logger.error(err)
             response = HydraResponse.from_args(err)
 
@@ -87,7 +87,7 @@ def start_server():
     _cfg = yaml_cache.get_hydra_cfg()
     _port = _cfg['networking']['host_port']
     if not _port:
-        raise ValueError('No host_port found in "{}"'.format(_cfg.yaml_path))
+        raise ValueError(f'No host_port found in "{_cfg.yaml_path}"')
     server = HydraTCPServerThread(_port)
     ht.HydraThreadManager.add_thread(server)
     ht.HydraThreadManager.run_forever()

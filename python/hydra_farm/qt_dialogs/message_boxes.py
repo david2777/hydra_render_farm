@@ -14,7 +14,7 @@ def warning_box(parent, title="Warning!", msg="This is a sample warning!"):
     return QMessageBox.warning(parent, title, msg)
 
 
-def yes_no_box(parent, title="Yes/No?", msg="This is a sample yes/no dialog."):
+def yes_no_box(parent: object, title: object = "Yes/No?", msg: object = "This is a sample yes/no dialog.") -> object:
     """Creates a message box with Yes and No buttons. Returns QMessageBox.Yes
     if the user clicked Yes, or QMessageBox.No otherwise."""
     return QMessageBox.question(parent, title, msg, buttons=(QMessageBox.Yes | QMessageBox.No),

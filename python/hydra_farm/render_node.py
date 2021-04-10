@@ -147,7 +147,7 @@ class RenderTCPServer(object):
 
         else:
             response = servers.HydraResponse()
-            response.msg = 'No handler for cmd {} on {}'.format(request.cmd, self.__class__.__name__)
+            response.msg = f'No handler for cmd {request.cmd} on {self.__class__.__name__}'
 
         return response
 
@@ -254,9 +254,9 @@ class RenderTCPServer(object):
             self.shutdown()
             return
 
-        log.write('Hydra log file {0} on {1}\n'.format(log_path, self.this_node.host))
-        log.write('RenderNode is {0}\n'.format(sys.argv))
-        log.write('Command: {0}\n\n'.format(render_task_cmd))
+        log.write(f'Hydra log file {log_path} on {self.this_node.host}\n')
+        log.write(f'RenderNode is {sys.argv}\n')
+        log.write(f'Command: {render_task_cmd}\n\n')
         log.flush()
         os.fsync(log.fileno())
 
@@ -325,8 +325,7 @@ class RenderTCPServer(object):
         self.this_node.update()
 
         # Log and complete
-        s = "\nProcess exited with code {0} at {1} on {2}\n"
-        log.write(s.format(task.exit_code, task.end_time, self.this_node.host))
+        log.write(f"\nProcess exited with code {task.exit_code} at {task.end_time} on {self.this_node.host}\n")
         self.child_process = None
         self.ps_util_proc = None
 

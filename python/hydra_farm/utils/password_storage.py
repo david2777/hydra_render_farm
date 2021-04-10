@@ -73,7 +73,7 @@ def console_prompt():
     host = config['database']['host']
     domain = config['networking']['dns_domain_ext']
     if domain and host not in ["localhost", "::1"] and not host.startswith("127."):
-        host += ".{}".format(domain)
+        host += f".{domain}"
     database_name = config['database']['db']
     port = int(config['database']['port'])
 

@@ -92,7 +92,7 @@ def my_host_name() -> str:
     host = socket.gethostname()
     domain = config['networking']['dns_domain_ext']
     if domain:
-        return "{0}.{1}".format(host, domain)
+        return f"{host}.{domain}"
     else:
         return host
 

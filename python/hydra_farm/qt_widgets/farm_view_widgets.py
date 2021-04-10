@@ -78,8 +78,8 @@ class JobTreeItem(QtWidgets.QTreeWidgetItem):
 
         """
         # Format Data
-        percent = "{0:.0f}%".format(self.job.task_done / self.job.task_total * 100)
-        task_string = "{0} ({1}/{2})".format(percent, self.job.task_done, self.job.task_total)
+        percent = f"{self.job.task_done / self.job.task_total * 100:.0f}%"
+        task_string = f"{percent} ({self.job.task_done}/{self.job.task_total})"
         job_data = (self.job.id, self.job.name, self.job.status_enum.nice_name, task_string,
                     self.job.owner, self.job.priority, self.job.mpf, self.job.attempts)
         job_data = tuple(map(str, job_data))
@@ -180,7 +180,7 @@ class NodeTreeItem(QtWidgets.QTreeWidgetItem):
             days = int(total_seconds / 60 / 60 / 24)
             hours = int(total_seconds / 60 / 60 % 24)
             minutes = int(total_seconds / 60 % 60)
-            time_string = "{0} Days, {1} Hours, {2} Mins ago".format(days, hours, minutes)
+            time_string = f"{days} Days, {hours} Hours, {minutes} Mins ago"
 
         node_data = (self.node.host, self.node.status_enum.nice_name, self.node.task_id,
                      self.node.software_version, self.node.ip_addr, time_string, self.node.capabilities)

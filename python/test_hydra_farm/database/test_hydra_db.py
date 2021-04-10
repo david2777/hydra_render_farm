@@ -105,7 +105,7 @@ class BaseTests:
 
             """
             with sql.Transaction() as t:
-                t.cur.execute('DESCRIBE {}'.format(self.table.table_name))
+                t.cur.execute(f'DESCRIBE {self.table.table_name}')
                 cols = set([desc[0] for desc in t.cur.fetchall()])
             self.assertSetEqual(self.table.columns, cols)
 

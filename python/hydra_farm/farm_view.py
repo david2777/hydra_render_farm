@@ -522,7 +522,7 @@ class FarmView(QtWidgets.QMainWindow):
         """
         arch_mode = 1 if arch_mode else 0
         mode_str = 'archive' if arch_mode else 'unarchive'
-        choice = message_boxes.yes_no_box(self, "Confirm", "Really {0} the selected jobs?".format(mode_str))
+        choice = message_boxes.yes_no_box(self, "Confirm", f"Really {mode_str} the selected jobs?")
         if choice == QtWidgets.QMessageBox.No:
             return None
 
@@ -613,10 +613,10 @@ class FarmView(QtWidgets.QMainWindow):
                 task_failures = [i for i, x in enumerate(raw_responses[idx]) if not x]
                 status_success = task_failures[-1]
                 task_success = task_failures[:-1]
-                task_string += "Jobs '{}' had ".format([j.id for j in selected_jobs])
+                task_string += f"Jobs '{[j.id for j in selected_jobs]}' had "
                 if not status_success:
                     task_string += "an error changing its status and "
-                task_string += "{} errors killing subtasks.\n".format(len(task_success))
+                task_string += f"{len(task_success)} errors killing subtasks.\n"
                 resp_string += task_string
 
             logger.error(resp_string)
@@ -687,7 +687,7 @@ class FarmView(QtWidgets.QMainWindow):
             return
 
         for job in selected_jobs:
-            msg_string = "Priority for job {0}:".format(job.name)
+            msg_string = f"Priority for job {job.name}:"
             reply = message_boxes.int_box(self, "Set Job Priority", msg_string, job.priority)
             if reply[1]:
                 job.prioritize(reply[0])
@@ -707,7 +707,7 @@ class FarmView(QtWidgets.QMainWindow):
         # noinspection PyTypeChecker
         self.load_task_tree(item.job, clear=True)
         self.current_selected_job = item.job
-        self.task_tree_job_label.setText("Job ID: [{0}]".format(item.job.id))
+        self.task_tree_job_label.setText(f"Job ID: [{item.job.id}]")
 
     def load_task_tree(self, job: sql.HydraRenderJob, clear: bool = False):
         """Load the tasks into the task tree for the selected job.
@@ -823,7 +823,7 @@ class FarmView(QtWidgets.QMainWindow):
         if not all(responses):
             failure_idxs = [i for i, x in enumerate(responses) if not x]
             failure_ids = [tasks[i].id for i in failure_idxs]
-            err = "Task Kill failed on task(s) with IDs {}".format(failure_ids)
+            err = f"Task Kill failed on task(s) with IDs {failure_ids}"
             logger.error(err)
             message_boxes.warning_box(self, "Task Kill Error!", err)
 
@@ -879,7 +879,7 @@ class FarmView(QtWidgets.QMainWindow):
         if log_path and log_path.is_file():
             webbrowser.open(str(log_path.resolve()))
         else:
-            err = "Log could not be found for Task {}".format(int(task.id))
+            err = f"Log could not be found for Task {int(task.id)}"
             logger.warning(err)
             message_boxes.warning_box(self, "Log Not Found", err)
 
@@ -895,9 +895,9 @@ class FarmView(QtWidgets.QMainWindow):
         if log_path and log_path.is_file():
             path = str(log_path.resolve())
             if sys.platform.startswith('win'):
-                os.system('start powershell Get-Content {} -Wait'.format(path))
+                os.system(f'start powershell Get-Content {path} -Wait')
             else:
-                os.system('start bash tail -f {}'.format(path))
+                os.system(f'start bash tail -f {path}')
 
     # --------------------------------------------------------------------------#
     # -----------------------------NODE METHODS---------------------------------#
@@ -1007,7 +1007,7 @@ class FarmView(QtWidgets.QMainWindow):
             failure_nodes = [nodes[i] for i in failure_idxs]
             logger.error("Could not get off %s", failure_nodes)
             message_boxes.warning_box(self, "GetOff Error!",
-                                      "Could not get off the following nodes: {}".format(failure_nodes))
+                                      f"Could not get off the following nodes: {failure_nodes}")
 
         self.populate_node_tree()
 

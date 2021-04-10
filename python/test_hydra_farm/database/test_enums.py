@@ -17,7 +17,7 @@ class TestEnums(unittest.TestCase):
             try:
                 enums.Color[status.value]
             except KeyError:
-                self.fail('{} is not in enums.Color'.format(status.value))
+                self.fail(f'{status.value} is not in enums.Color')
 
     def test_status_eq(self):
         """Test that we can compare strings and Enums to our HydraStatus class.

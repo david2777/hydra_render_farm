@@ -25,7 +25,7 @@ class NodeEditorDialog(QtWidgets.QDialog):
 
         self.defaults = defaults
         if defaults:
-            title = "Editing {0}:".format(defaults["host"])
+            title = f"Editing {defaults['host']}:"
             self.editorGroup.setTitle(title)
             self.minPrioritySpinbox.setValue(defaults["priority"])
             if defaults["ip_addr"]:

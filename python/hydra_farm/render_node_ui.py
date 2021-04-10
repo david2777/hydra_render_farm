@@ -398,8 +398,7 @@ class schedulerThread(hydra_threading.StoppableThread):
 def pulse():
     host = hydra_utils.my_host_name()
     with sql.Transaction() as t:
-        t.cur.execute("UPDATE HydraRenderNode SET pulse = NOW() "
-                      "WHERE host = '{0}'".format(host))
+        t.cur.execute(f"UPDATE HydraRenderNode SET pulse = NOW() WHERE host = '{host}'")
 
 
 if __name__ == "__main__":

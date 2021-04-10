@@ -42,7 +42,7 @@ class HydraThread(threading.Thread):
         super(HydraThread, self).__init__(target=target, name=name, args=args, kwargs=kwargs, daemon=True)
 
     def __repr__(self) -> str:
-        return "HydraThread [{}]".format(self.name)
+        return f"HydraThread [{self.name}]"
 
     def run(self) -> None:
         """Run the thread until the stop event is set.

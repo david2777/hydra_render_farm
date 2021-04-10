@@ -21,7 +21,7 @@ def get_database_info() -> tuple:
     host = config['database']['host']
     domain = config['networking']['dns_domain_ext']
     if domain and host not in ["localhost", "::1"] and not host.startswith("127."):
-        host = "{0}.{1}".format(host, domain)
+        host = f"{host}.{domain}"
     database_name = config['database']['db']
     port = int(config['database']['port'])
     db_username = config['database']['username']
