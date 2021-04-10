@@ -29,9 +29,10 @@ class YamlCache(UserDict):
         """Read the data from the yaml file.
 
         """
+        _yml = yaml.YAML(typ='rt')
         if self.yaml_path.is_file():
             with open(str(self.yaml_path.resolve()), 'r') as f:
-                self.data = yaml.load(f, Loader=yaml.RoundTripLoader)
+                self.data = _yml.load(f)
         else:
             self.data = {}
 
