@@ -19,12 +19,9 @@ from hydra_farm.database.enums import HydraStatus
 from hydra_farm.utils.logging_setup import logger
 from hydra_farm.networking.connections import HydraRequest, HydraResponse, send_request
 
-config = yaml_cache.get_hydra_cfg()
-
-UNIT_TEST = bool(ast.literal_eval(os.environ.get('Hydra_Unit_Test', "False")))
-
-T = TypeVar('T', bound='AbstractHydraTable')  # For type hinting on tables
-
+_config = yaml_cache.get_hydra_cfg()
+_UNIT_TEST = bool(ast.literal_eval(os.environ.get('Hydra_Unit_Test', "False")))
+_T = TypeVar('_T', bound='AbstractHydraTable')  # For type hinting on tables
 STUCK_STATUS = {HydraStatus.STARTED, HydraStatus.PENDING}
 
 
@@ -88,7 +85,7 @@ class AbstractHydraTable(object):
         self.do_refresh(data_dict)
 
     def __repr__(self):
-        return "<{0}> [{1}: {2}]".format(type(self).__name__, self.primary_key, getattr(self, self.primary_key))
+        return f"<{type(self).__name__}> [{self.primary_key}: {getattr(self, self.primary_key)}]"
 
     def __setattr__(self, key: str, value: Any):
         """Override __setattr__ to add cols to _dirty for the _update method.
@@ -150,7 +147,7 @@ class AbstractHydraTable(object):
             columns.add(self.primary_key)
             columns = ','.join(columns)
 
-        select = "SELECT {0} FROM {1} WHERE {2} = %s".format(columns, self.table_name, self.primary_key)
+        select = f"SELECT {columns} FROM {self.table_name} WHERE {self.primary_key} = %s"
 
         t, transaction_context = self._get_transaction(explicit_transaction)
         with transaction_context:
@@ -159,7 +156,7 @@ class AbstractHydraTable(object):
         self.do_refresh(result[0])
 
     @staticmethod
-    def bulk_refresh(records: List[T]):
+    def bulk_refresh(records: List[_T]):
         """Refresh a list of instances with the latest from the DB, grouping by table for speed. Currently just selects
         * instead of individual cols since I think the overhead of comparing cols is higher than selecting *.
 
@@ -177,7 +174,7 @@ class AbstractHydraTable(object):
         for cls, cls_records in record_by_type.items():
             primary_key = cls.primary_key
             keys_str = ','.join(['%s' for _ in cls_records])
-            select = "SELECT * FROM {0} WHERE {1} in ({2})".format(cls.table_name, primary_key, keys_str)
+            select = f"SELECT * FROM {cls.table_name} WHERE {primary_key} in ({keys_str})"
             with Transaction() as t:
                 result = cls._do_fetch(t, select, tuple(cls_records.keys()))
 
@@ -234,8 +231,8 @@ class AbstractHydraTable(object):
         return result
 
     @classmethod
-    def fetch(cls: Type[T], clause: str = None, args: Union[Iterable, Mapping] = None, columns: Sequence = None,
-              explicit_transaction: Transaction = None) -> List[T]:
+    def fetch(cls: Type[_T], clause: str = None, args: Union[Iterable, Mapping] = None, columns: Sequence = None,
+              explicit_transaction: Transaction = None) -> List[_T]:
         """Fetch row(s) from the database and return as DB instance(s).
 
         Args:
@@ -256,8 +253,7 @@ class AbstractHydraTable(object):
             columns.add(cls.primary_key)
             col_sel = ','.join(columns)
 
-        query = "SELECT {0} FROM {1} {2}"
-        query = query.format(col_sel, cls.table_name, clause)
+        query = f"SELECT {col_sel} FROM {cls.table_name} {clause}"
 
         t, transaction_context = cls._get_transaction(explicit_transaction)
         with transaction_context:
@@ -279,8 +275,7 @@ class AbstractHydraTable(object):
             Any: Value of the col for this row on the db.
 
         """
-        query = "SELECT {1} FROM {0} WHERE {2} = %s"
-        query = query.format(self.table_name, col, self.primary_key)
+        query = f"SELECT {col} FROM {self.table_name} WHERE {self.primary_key} = %s"
         args = (getattr(self, self.primary_key),)
         logger.debug(query, *args)
 
@@ -331,7 +326,7 @@ class AbstractHydraTable(object):
             transaction_context = t
         return t, transaction_context
 
-    def insert(self, explicit_transaction: Transaction = None) -> T:
+    def insert(self, explicit_transaction: Transaction = None) -> _T:
         """Insert this item into the table.
 
         Args:
@@ -351,8 +346,9 @@ class AbstractHydraTable(object):
         names = tuple(data.keys())
         values = tuple(data.values())
 
-        query = "INSERT INTO {0} ({1}) VALUES ({2})"
-        query = query.format(self.table_name, ", ".join(names), ", ".join(['%s' for _ in names]))
+        _names = ", ".join(names)
+        _fields = ", ".join(['%s' for _ in names])
+        query = f"INSERT INTO {self.table_name} ({_names}) VALUES ({_fields})"
         logger.debug(query, *values)
 
         t, transaction_context = self._get_transaction(explicit_transaction)
@@ -388,10 +384,9 @@ class AbstractHydraTable(object):
             return False
 
         names = self._dirty
-        assignments = ", ".join(["{} = %s".format(n) for n in names])
+        assign = ", ".join([f"{n} = %s" for n in names])
         values = tuple(getattr(self, n) for n in names)
-        query = "UPDATE {0} SET {1} WHERE {2} = {3}"
-        query = query.format(self.table_name, assignments, self.primary_key, getattr(self, self.primary_key))
+        query = f"UPDATE {self.table_name} SET {assign} WHERE {self.primary_key} = {getattr(self, self.primary_key)}"
         logger.debug(query, *values)
 
         t, transaction_context = self._get_transaction(explicit_transaction)
@@ -425,8 +420,7 @@ class AbstractHydraTable(object):
         if isinstance(value, Enum):
             value = value.value
 
-        query = "UPDATE {0} SET {1} = %s WHERE {2} = %s"
-        query = query.format(self.table_name, attr, self.primary_key)
+        query = f"UPDATE {self.table_name} SET {attr} = %s WHERE {self.primary_key} = %s"
         args = (value, getattr(self, self.primary_key))
         logger.debug(query, *args)
 
@@ -457,7 +451,7 @@ class AbstractHydraTable(object):
 
 class HydraRenderNode(AbstractHydraTable):
     table_name = "hydra.render_nodes"
-    if UNIT_TEST:
+    if _UNIT_TEST:
         table_name = "test_" + table_name
     primary_key = 'id'
     _auto_column = 'id'
@@ -500,7 +494,7 @@ class HydraRenderNode(AbstractHydraTable):
 
         """
         with Transaction() as t:
-            t.cur.execute("SELECT count(status), status from {} GROUP BY status".format(cls.table_name))
+            t.cur.execute(f"SELECT count(status), status from {cls.table_name} GROUP BY status")
             status_counts = t.cur.fetchall()
 
         if nice_name:
@@ -629,7 +623,7 @@ class HydraRenderNode(AbstractHydraTable):
                              T.id ASC
                     LIMIT 1;"""
 
-        args = (HydraStatus.READY.value, self.min_priority, '%{}%'.format(self.host), self.capabilities)
+        args = (HydraStatus.READY.value, self.min_priority, f'%{self.host}%', self.capabilities)
 
         with Transaction() as t:
             logger.debug("Checking for tasks")
@@ -682,7 +676,7 @@ class HydraRenderNode(AbstractHydraTable):
 
 class HydraRenderJob(AbstractHydraTable):
     table_name = "hydra.jobs"
-    if UNIT_TEST:
+    if _UNIT_TEST:
         table_name = 'test_' + table_name
     primary_key = 'id'
     _auto_column = 'id'
@@ -867,7 +861,7 @@ class HydraRenderJob(AbstractHydraTable):
 
             if failed_node:
                 self.attempts += 1
-                self.failed_nodes += "{} ".format(failed_node)
+                self.failed_nodes += f"{failed_node} "
 
             if self.attempts >= self.max_attempts:
                 self.status = HydraStatus.ERROR
@@ -894,7 +888,7 @@ class HydraRenderJob(AbstractHydraTable):
 
 class HydraRenderTask(AbstractHydraTable):
     table_name = "hydra.tasks"
-    if UNIT_TEST:
+    if _UNIT_TEST:
         table_name = 'test_' + table_name
     primary_key = 'id'
     _auto_column = 'id'
@@ -1075,7 +1069,7 @@ class HydraRenderTask(AbstractHydraTable):
         """
         logger.debug('Kill task on %s', self.host)
         node = self.get_host(["ip_addr"])
-        port = int(config['networking']['host_port'])
+        port = int(_config['networking']['host_port'])
         request = HydraRequest.from_args('kill_current_task', args=(new_status,))
         response = send_request(node.ip_addr, port, request)
         if response.msg.startswith('TimeoutError'):
@@ -1132,18 +1126,18 @@ class HydraRenderTask(AbstractHydraTable):
 
         """
         this_host = hydra_utils.my_host_name()
-        render_log_dir = config['logs']['render_log_path']
-        path = pathlib.Path(render_log_dir, '{:0>10}.log.txt'.format(self.id))
+        render_log_dir = _config['logs']['render_log_path']
+        path = pathlib.Path(render_log_dir, f'{self.id:0>10}.log.txt')
         if self.host and this_host == self.host:
             return path
         elif self.host:
-            path = pathlib.Path('//{}'.format(self.host), str(path).replace(path.drive, ''))
+            path = pathlib.Path(f'//{self.host}', str(path).replace(path.drive, ''))
             return path
 
 
 class HydraCapabilities(AbstractHydraTable):
     table_name = "hydra.capabilities"
-    if UNIT_TEST:
+    if _UNIT_TEST:
         table_name = 'test_' + table_name
     primary_key = 'name'
     _auto_column = None
