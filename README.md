@@ -2,6 +2,9 @@
 A simple MySQL based render farm software. No central queue server, just a list of jobs and tasks on a MySQL table that
 the various systems interact with. 
 
+Originally based off of the [Project Hydra Render Farm](https://github.com/CogswellProjectHydra/githubHydraRepo) from
+[Cogswell College](http://cogswell.edu/) which I used in college. 
+
 ## Features
 * Prioritization 
 * Provisioning via node "Capabilities" and job "Requirements"
