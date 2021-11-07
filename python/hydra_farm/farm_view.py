@@ -189,7 +189,7 @@ class FarmView(QtWidgets.QMainWindow):
                             self.online_render_nodes_callback: "Ctrl+Alt+O",
                             self.offline_render_nodes_callback: "Ctrl+Alt+Shift+O",
                             self.get_off_render_nodes_callback: "Ctrl+Alt+G",
-                            self.reveal_node_detailed_callback: "Ctrl+Alt+D",
+                            self.node_detailed_data_callback: "Ctrl+Alt+D",
                             self.node_editor_table_callback: "Ctrl+Alt+E",
                             # Job Tree hotkeys
                             self.start_job_callback: "Ctrl+S",
@@ -300,7 +300,7 @@ class FarmView(QtWidgets.QMainWindow):
         node_menu.addSection("Advanced")
         node_menu.add_action("Select by Host Name...", self.select_by_host_callback,
                              "Open a dialog to check nodes based on their host name")
-        node_menu.add_action("Reveal Detailed Data...", self.reveal_node_detailed_callback,
+        node_menu.add_action("Show Detailed Data...", self.node_detailed_data_callback,
                              "Opens a dialog window the detailed data for the selected nodes.")
         node_menu.add_action("Edit Node...", self.node_editor_table_callback,
                              "Open a dialog to edit selected node's attributes.")
@@ -1056,7 +1056,7 @@ class FarmView(QtWidgets.QMainWindow):
                 t.cur.execute(query, edits_tuple)
             self.populate_node_tree()
 
-    def reveal_node_detailed_callback(self):
+    def node_detailed_data_callback(self):
         """Opens Detailed Data Dialogs for the selected nodes.
 
         """
