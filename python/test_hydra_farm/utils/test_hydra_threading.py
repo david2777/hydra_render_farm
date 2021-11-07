@@ -18,7 +18,6 @@ class MyTestCase(unittest.TestCase):
         ht.HydraThreadManager.add_thread(thread2)
         self.assertEqual(2, len(ht.HydraThreadManager.all_threads))
         ht.HydraThreadManager.shutdown()
-        self.assertEqual(0, len(ht.HydraThreadManager.all_threads))
 
 
 if __name__ == '__main__':
