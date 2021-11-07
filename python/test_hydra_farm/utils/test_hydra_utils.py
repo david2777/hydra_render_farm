@@ -49,6 +49,15 @@ class TestHydraUtils(unittest.TestCase):
         self.assertTrue(hasattr(obj, 'does_not_exist'))
         self.assertFalse(hydra_utils.hasattr_static(obj, 'does_not_exist'))
 
+    def test_timer(self):
+        """Test hydra_utils.Timer
+
+        """
+        timer = hydra_utils.Timer()
+        time.sleep(0.1)
+        end = timer.end(1)
+        self.assertEqual(0.1, float(end))
+
 
 if __name__ == '__main__':
     unittest.main()
