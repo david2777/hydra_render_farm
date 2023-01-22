@@ -32,6 +32,11 @@ class FarmView(QtWidgets.QMainWindow):
 
     """
     # Type hinting
+    # Main
+    splitter_job_list: QtWidgets.QSplitter
+    central_widget: QtWidgets.QWidget
+    statusbar: QtWidgets.QStatusBar
+
     # Job Tab
     job_tree: QtWidgets.QTreeWidget
     task_tree: QtWidgets.QTreeWidget
